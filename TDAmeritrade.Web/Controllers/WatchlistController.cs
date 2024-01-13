@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,19 +22,30 @@ namespace TDAmeritrade.Web.Controllers
             _client = client;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public async Task<IActionResult> GetAccount(string accountId)
+        public async Task<IActionResult> Index(string accountId)
         {
             if (!_client.IsSignedIn)
             {
                 await _client.SignIn();
             }
-            var data = await _client.GetAccount(accountId);
-            return Content(data);
+            var data = await _client.GetWatchlist(accountId);
+            
+            var dataModel = JsonConvert.DeserializeObject<List<TDWatchlistModel>>(data);
+            var vm = new WatchlistViewModel();
+            vm.Symbols = new List<string>();
+
+            foreach (var dm in dataModel)
+            {
+                foreach (var item in dm.watchlistItems)
+                {
+                    if (item.instrument.assetType == "EQUITY")
+                    {
+                        vm.Symbols.Add(item.instrument.symbol);
+                    }
+                }
+            }
+
+            return View(vm);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
