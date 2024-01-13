@@ -85,6 +85,11 @@ namespace TDAmeritrade.Web.Controllers
             return Content(data);
         }
 
+        public IActionResult Version()
+        {
+            return Content("v1");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
