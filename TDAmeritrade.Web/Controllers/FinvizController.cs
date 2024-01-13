@@ -121,8 +121,7 @@ namespace TDAmeritrade.Web.Controllers
             return View(vm);
         }
 
-
-        public async Task<IActionResult> Movers(int top = 5)
+        public async Task<IActionResult> Movers(string sectorSymbol = "*", int top = 5)
         {
             var jsonData = string.Empty;
 
@@ -143,6 +142,14 @@ namespace TDAmeritrade.Web.Controllers
             var vm = new WatchlistViewModel();
             vm.Symbols = new List<string>();
 
+            var includeAll = sectorSymbol == Constants.SectorAll;
+            IDictionary<string, string> symbolMap = null;
+
+            if (!includeAll)
+            {
+                symbolMap = await FinvizUtils.FetchSectorSymbolMap(sectorSymbol);
+            }
+
             var obj = JObject.Parse(jsonData);
 
             // string subtype = (string)obj["subtype"];
@@ -155,6 +162,12 @@ namespace TDAmeritrade.Web.Controllers
             foreach (var node in nodes)
             {
                 string nodeName = node.Key;
+
+                if (!includeAll && symbolMap != null && !symbolMap.ContainsKey(nodeName))
+                {
+                    continue;
+                }
+
                 double nodeValue = (double)node.Value;
 
                 if (nodeValue > 0)
