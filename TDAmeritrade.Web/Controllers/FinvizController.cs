@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,11 +30,6 @@ namespace TDAmeritrade.Web.Controllers
 
         public async Task<IActionResult> Index(string sectorSymbol = "*", int top = 5)
         {
-            if (!_client.IsSignedIn)
-            {
-                await _client.SignIn();
-            }
-
             var jsonData = string.Empty;
 
             using (var client = new HttpClient())
@@ -123,6 +119,58 @@ namespace TDAmeritrade.Web.Controllers
             }
 
             return View(vm);
+        }
+
+
+        public async Task<IActionResult> Movers(int top = 5)
+        {
+            var jsonData = string.Empty;
+
+            using (var client = new HttpClient())
+            {
+                var res = await client.GetAsync("https://finviz.com/api/map_perf.ashx?t=sec&st=d1");
+
+                if (!res.IsSuccessStatusCode)
+                {
+                    throw (new Exception($"{res.StatusCode} {res.ReasonPhrase}"));
+                }
+                else
+                {
+                    jsonData = await res.Content.ReadAsStringAsync();
+                }
+            }
+
+            var vm = new WatchlistViewModel();
+            vm.Symbols = new List<string>();
+
+            var obj = JObject.Parse(jsonData);
+
+            // string subtype = (string)obj["subtype"];
+            // int version = (int)obj["version"];
+
+            var upList = new List<Tuple<string, double>>();
+            var downList = new List<Tuple<string, double>>();
+
+            var nodes = (JObject)obj["nodes"];
+            foreach (var node in nodes)
+            {
+                string nodeName = node.Key;
+                double nodeValue = (double)node.Value;
+
+                if (nodeValue > 0)
+                {
+                    upList.Add(new Tuple<string, double>(nodeName, nodeValue));
+                }
+                else if (nodeValue < 0)
+                {
+                    downList.Add(new Tuple<string, double>(nodeName, -nodeValue));
+                }
+            }
+
+            upList.OrderByDescending(x => x.Item2).Take(top).ToList().ForEach(x => vm.Symbols.Add(x.Item1));
+            downList.OrderByDescending(x => x.Item2).Take(top).ToList().ForEach(x => vm.Symbols.Add(x.Item1));
+
+            return View("Index", vm);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
