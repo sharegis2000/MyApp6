@@ -58,7 +58,7 @@ namespace TDAmeritrade
         /// https://www.reddit.com/r/algotrading/comments/c81vzq/td_ameritrade_api_access_2019_guide/
         /// https://www.reddit.com/r/algotrading/comments/914q22/successful_access_to_td_ameritrade_api/
         /// </summary>
-        public string GetSignInUrl(string consumerKey, string redirectUrl = "http://localhost")
+        public string GetSignInUrl(string consumerKey, string redirectUrl = "https://localhost")
         {
             var encodedKey = HttpUtility.UrlEncode(consumerKey);
             var encodedUri = HttpUtility.UrlEncode(redirectUrl);
@@ -75,7 +75,7 @@ namespace TDAmeritrade
         /// <param name="code">Required if trying to use authorization code grant</param>
         /// <param name="redirectUrl">Required if trying to use authorization code grant</param>
         /// <returns></returns>
-        public async Task SignIn(string consumerKey, string code, string redirectUrl = "http://localhost")
+        public async Task SignIn(string consumerKey, string code, string redirectUrl = "https://localhost")
         {
             var decoded = HttpUtility.UrlDecode(code);
             var path = "https://api.tdameritrade.com/v1/oauth2/token";
