@@ -50,6 +50,21 @@ namespace TDAmeritrade.Web.Controllers
             return Content(data);
         }
 
+        public async Task<IActionResult> OptionQuote(string symbol)
+        {
+            if (!_client.IsSignedIn)
+            {
+                await _client.SignIn();
+            }
+
+            var data = await _client.GetOptionsChainJson(new TDOptionChainRequest
+            {
+                symbol = symbol
+            });
+
+            return Content(data);
+        }
+
         public async Task<IActionResult> GetPrincipalsJson()
         {
             if (!_client.IsSignedIn)
