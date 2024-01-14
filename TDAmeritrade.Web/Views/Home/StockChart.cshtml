@@ -8,6 +8,7 @@
 	window.onload = function () {
 
 		var dps = [];
+		var dpsVol = [];
 
 		var chart = new CanvasJS.Chart("chartContainer", {
 			animationEnabled: true,
@@ -31,15 +32,25 @@
 				yValueFormatString: "##0.00",
 				xValueType: "dateTime",
 				dataPoints: dps
-			}]
+			},
+			// {
+			// 	type: "column",
+			// 	dataPoints: dpsVol // Array of volume data points
+			// }
+			]
 		});
 
 		function addData(data) {
 			for (var i = 0; i < data.length; i++) {
 				dps.push({
-					x: new Date(data[i].x),
-					y: data[i].y
+					x: new Date(data[i].datetime),
+					y: [Number(data[i].open), Number(data[i].high), Number(data[i].low), Number(data[i].close)]
 				});
+
+				// dpsVol.push({
+				// 	x: new Date(data[i].datetime),
+				// 	y: Number(data[i].volume)/10000
+				// });
 			}
 			chart.render();
 

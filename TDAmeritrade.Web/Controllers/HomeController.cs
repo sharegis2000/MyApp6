@@ -87,7 +87,8 @@ namespace TDAmeritrade.Web.Controllers
             //dataPoints.Add(new StockChartDataPointViewModel(1509388200000, new double[] { 87.282997, 87.282997, 87.282997, 87.282997 }));
 
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
-            return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+            //return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+            return Content(JsonConvert.SerializeObject(bars, _jsonSetting), "application/json");
         }
 
         public IActionResult RequestAccessToken(string consumerKey)
