@@ -495,7 +495,7 @@ namespace TDAmeritrade
         }
 
         /// <summary>
-        /// Get Account
+        /// Get Watchlist
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
@@ -522,6 +522,74 @@ namespace TDAmeritrade
                 }
             }
         }
+
+        /// <summary>
+        /// Get Transactions
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        public async Task<string> GetTransactionsJson(string accountId, TDTransactionsRequest model)
+        {
+            if (!IsSignedIn)
+            {
+                throw (new Exception("Not authenticated"));
+            }
+
+            var builder = new UriBuilder($"https://api.tdameritrade.com/v1/accounts/{accountId}/transactions");
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            
+            if (model.type.HasValue)
+            {
+                query["type"] = model.type.ToString();
+            }
+
+            var hasValidStartDate = false;
+            var hasValidEndDate = false;
+            DateTime endDate = DateTime.Now;
+            DateTime startDate = DateTime.Now;
+
+            if (!string.IsNullOrEmpty(model.startDate) && DateTime.TryParseExact(model.startDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out startDate))
+            {
+                hasValidStartDate = true;
+                query["startDate"] = model.startDate;
+            }
+
+            if (!string.IsNullOrEmpty(model.endDate) && DateTime.TryParseExact(model.endDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out endDate))
+            {
+                hasValidEndDate = true;
+                query["endDate"] = model.endDate;
+            }
+
+            if (!string.IsNullOrEmpty(model.symbol))
+            {
+                query["symbol"] = model.symbol;
+            }
+
+            var hasInValidDateRange = startDate.Ticks > endDate.Ticks;
+
+            if (hasValidStartDate && hasValidEndDate && hasInValidDateRange)
+            {
+                throw new Exception("Start date must be before end date");
+            }
+
+            builder.Query = query.ToString();
+            string url = builder.ToString();
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthResult.access_token);
+                var res = await client.GetAsync(url);
+
+                switch (res.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        return await res.Content.ReadAsStringAsync();
+                    default:
+                        throw (new Exception($"{res.StatusCode} {res.ReasonPhrase}"));
+                }
+            }
+        }
+
         #endregion
 
         #region Misc

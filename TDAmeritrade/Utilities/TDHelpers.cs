@@ -77,6 +77,25 @@ namespace TDAmeritrade
         {
             return symbol != null && symbol.Length > 12;
         }
+
+        public static float ParseOptionStrike(string symbol, string putCall)
+        {
+            var index = symbol.LastIndexOf(putCall[0]) + 1;
+            var strike = float.Parse(symbol.Substring(index));
+            return strike;
+        }
+
+        public static string FormatOptionExpirationDate(string optionExpirationDate, string dateFormat)
+        {
+            return DateTime.Parse(optionExpirationDate.Substring(0, dateFormat.Length)).ToString("MM/dd");
+        }
+
+        public static int CalculateOptionDTE(string optionExpirationDate, DateTime transactionDate)
+        {
+            var expirationDate = DateTime.Parse(optionExpirationDate);
+            return (int)Math.Ceiling((expirationDate - transactionDate).TotalDays);
+        }
+
         public static bool IsEquitySymbol(string symbol)
         {
             return symbol != null && !IsFutureSymbol(symbol) && !IsIndexSymbol(symbol) && !IsOptionSymbol(symbol);

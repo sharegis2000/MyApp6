@@ -76,12 +76,22 @@ body {
     margin-top: 20px;
 }
 
-.tblsteps th, .tblsteps td{
+.tblrecap {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px;
+}
+
+.tblsteps th,
+.tblrecap th,
+.tblsteps td,
+.tblrecap td {
     border: 1px solid black;
     padding: 8px;
     text-align: left;
 }
 
-.tblsteps th {
+.tblsteps th,
+.tblrecap th {
     background-color: #f2f2f2;
 }

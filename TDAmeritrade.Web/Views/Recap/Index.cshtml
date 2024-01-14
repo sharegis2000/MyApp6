@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Watchlist Page";
+}
+
+@* <div>
+    <a href="https://finviz.com/quote.ashx?t=MSFT">
+        <img src="https://finviz.com/chart.ashx?t=MSFT&ty=c&ta=1&p=d&s=l" width="990px" height="400px" />
+        <img src="https://finviz.com/chart.ashx?t=MSFT&ty=c&ta=0&p=w" width="990px" height="400px" />
+        <img src="https://finviz.com/chart.ashx?t=MSFT&ty=c&ta=0&p=m" width="990px" height="400px" />
+    </a>
+</div> *@
+
+<table class="tblrecap">
+    <thead>
+        <tr>
+            <th>transactionDate</th>
+            <th>orderDate</th>
+            <th>symbol</th>
+            <th>strike</th>
+            <th>putCall</th>
+            <th>instruction</th>
+            <th>amount</th>
+            <th>price</th>
+            <th>optionExpiration</th>
+            <th>percentage</th>
+            <th>DTE</th>
+            <th>positionEffect</th>
+            <th>tags</th>
+            <th>comment</th>
+            <th></th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var isOptionSymbol = !string.IsNullOrEmpty(item?.transactionItem?.instrument?.underlyingSymbol);
+            var percentage = string.Empty;
+            var strike = 0.0f;
+
+            if (isOptionSymbol)
+            {
+                strike = TDAmeritrade.TDHelpers.ParseOptionStrike(item.transactionItem.instrument.symbol, item.transactionItem.instrument.putCall);
+                var perVal = item.transactionItem.price / strike * 1.0f;
+                percentage = perVal.ToString("P");
+            }
+
+            <tr>
+                <td>@item.transactionDate</td>
+                <td>@item.orderDate</td>
+                <td>@(isOptionSymbol ? item.transactionItem.instrument.underlyingSymbol : item.transactionItem.instrument.symbol)</td>
+                <td>@(isOptionSymbol ? TDAmeritrade.TDHelpers.ParseOptionStrike(item.transactionItem.instrument.symbol, item.transactionItem.instrument.putCall).ToString() : string.Empty)</td>
+                <td>@item.transactionItem.instrument.putCall</td>
+                <td>@item.transactionItem.instruction</td>
+                <td>@item.transactionItem.amount</td>
+                <td>@item.transactionItem.price</td>
+
+                <td>@(isOptionSymbol ? TDAmeritrade.TDHelpers.FormatOptionExpirationDate(item.transactionItem.instrument.optionExpirationDate, "yyyy-MM-dd") : string.Empty)</td>
+
+                <td>@percentage</td>
+                <td>@(isOptionSymbol ? TDAmeritrade.TDHelpers.CalculateOptionDTE(item.transactionItem.instrument.optionExpirationDate, item.transactionDate) : string.Empty)</td>
+                <td>@item.transactionItem.positionEffect</td>
+                @* <td>scalp,day trading, level 2, earnings play, after earnings, roll, hedging, gap up, gap down, second day play</td> *@
+                <td></td>
+                <td></td>
+                <td>
+                    @* <a asp-action="Edit" asp-route-id="@transaction.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@transaction.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@transaction.Id">Delete</a> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+
+   @*  @foreach (var symbol in Model.Symbols)
+    {
+        <tr>
+            <td>
+                <a href="https://finviz.com/quote.ashx?t=@symbol">
+                    <img src="https://finviz.com/chart.ashx?t=@symbol&ty=c&ta=1&p=d&s=l" width="990px" height="400px" />
+                </a>
+            </td>
+            <td>
+                <a href="https://finviz.com/quote.ashx?t=@symbol">
+                    <img src="https://finviz.com/chart.ashx?t=@symbol&ty=c&ta=0&p=w" width="990px" height="400px" />
+                </a>
+            </td>
+        </tr>
+    } *@
+    
+</table>
