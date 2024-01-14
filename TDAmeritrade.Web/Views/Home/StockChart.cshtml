@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Stock Chart Page";
+}
+
+<div id="chartContainer" style="height: 500px; max-width: 920px; margin: 0px auto;"></div>
+
+<script type="text/javascript">
+	window.onload = function () {
+
+		var dps = [];
+
+		var chart = new CanvasJS.Chart("chartContainer", {
+			animationEnabled: true,
+			exportEnabled: true,
+			title: {
+				text: "@Model Stock Price"
+			},
+			axisX: {
+				valueFormatString: "HH:mm DD MMM"
+			},
+			axisY: {
+				title: "Price",
+				prefix: "",
+				gridColor: "transparent"
+			},
+			data: [{
+				type: "candlestick",
+				name: "@Model Stock Price",
+				showInLegend: true,
+				xValueFormatString: "HH:mm DD MMM",
+				yValueFormatString: "##0.00",
+				xValueType: "dateTime",
+				dataPoints: dps
+			}]
+		});
+
+		function addData(data) {
+			for (var i = 0; i < data.length; i++) {
+				dps.push({
+					x: new Date(data[i].x),
+					y: data[i].y
+				});
+			}
+			chart.render();
+
+		}
+
+		$.getJSON("/home/StockChartJson?symbol=@Model", addData);
+	}
+</script>
