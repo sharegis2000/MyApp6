@@ -172,7 +172,7 @@ namespace TDAmeritrade.Web.Controllers
 
         public IActionResult Version()
         {
-            return Content("v1");
+            return Content("v2");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
