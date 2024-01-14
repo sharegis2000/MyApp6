@@ -18,7 +18,7 @@ namespace TDAmeritrade
         {
             get
             {
-                return TDHelpers.FromUnixTimeSeconds(datetime);
+                return TDHelpers.FromUnixTimeMilliseconds(datetime);
             }
             set
             {

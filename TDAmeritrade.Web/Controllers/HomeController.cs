@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
+using System.Text;
 using System.Threading.Tasks;
 using TDAmeritrade.Web.Models;
 
@@ -46,7 +46,7 @@ namespace TDAmeritrade.Web.Controllers
 				frequencyType = TDPriceHistoryRequest.FrequencyType.minute,
 				frequency = 30,
 				periodType = TDPriceHistoryRequest.PeriodTypes.day,
-				period = 2,
+				period = 10,
 				//needExtendedHoursData = false
 			});
 
@@ -57,10 +57,20 @@ namespace TDAmeritrade.Web.Controllers
 
 			List<StockChartDataPointViewModel> dataPoints = new List<StockChartDataPointViewModel>();
 
+            //var sb = new StringBuilder();
+
             foreach (var bar in bars)
             {
 				dataPoints.Add(new StockChartDataPointViewModel(bar.datetime, new double[] { bar.open, bar.high, bar.low, bar.close }));
+
+                //sb.AppendLine($"{bar.DateTime.ToString("yyyyMMdd HHmmss")};{bar.open};{bar.high};{bar.low};{bar.close};{bar.volume}");
 			}
+
+   //         var csv = sb.ToString();
+   //         if (!string.IsNullOrEmpty(csv))
+   //         {
+			//	System.IO.File.WriteAllText($"c:\\temp\\{symbol}.Last.txt", csv);
+			//}
 
             // x: unix timestamp in miliseconds, y: [open, high, low, close]
             //dataPoints.Add(new StockChartDataPointViewModel(1506882600000, new double[] { 85.990997, 86.374001, 85.945999, 86.374001 }));
